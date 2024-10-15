@@ -2,7 +2,7 @@ use std::fs;
 use std::io::Result;
 use usvg::{ Options, Rect, Tree};
 
-fn getBbox(root : &usvg::Group, total : &mut Vec<Rect>) -> &Vec<Rect> {
+fn get_bbox(root : &usvg::Group, total : &mut Vec<Rect>) -> &Vec<Rect> {
     
     if !root.has_children() {
         return &vec![root.bounding_box()];
@@ -11,7 +11,7 @@ fn getBbox(root : &usvg::Group, total : &mut Vec<Rect>) -> &Vec<Rect> {
     let mut level_bound = Vec::<Rect>::new();
     for node in root.children() {
         if let usvg::Node::Group(ref g) = node {
-            let cur = getBbox(g, total);
+            let cur = get_bbox(g, total);
             level_bound.extend(cur);
         } else {
             level_bound.push(node.bounding_box());
