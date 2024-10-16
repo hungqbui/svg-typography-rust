@@ -7,4 +7,7 @@ edition = "2021"
 
 [dependencies]
 resvg = "0.44.0"
+serde = { version = "1.0.210", features = ["derive"] }
+serde_json = "1.0.128"
+svg = "0.18.0"
 usvg = "0.44.0"
