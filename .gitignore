@@ -1,3 +1,5 @@
 /target
 .idx
 .env
+/venv
+/__pycache__
