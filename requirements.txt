@@ -1,0 +1,7 @@
+beautifulsoup4
+lxml
+google-cloud-vision
+requests
+pillow
+python-dotenv
+svgpathtools

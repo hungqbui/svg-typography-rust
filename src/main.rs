@@ -2,6 +2,8 @@ use std::fs;
 use std::io::Result;
 use usvg::{Options, Rect, Tree};
 use serde::{Serialize, Deserialize};
+use resvg::render;
+use tiny_skia::Pixmap;
 
 fn get_bbox(root : &usvg::Group, total : &mut Vec<Rect>) {
     
@@ -42,10 +44,15 @@ fn main() -> Result<()> {
 
             match tree {
                 Ok(tree) => {
+
+                    let size = tree.size();
+                    let mut pm = Pixmap::new(size.width() as u32, size.height() as u32).unwrap();
+
+                    render(&tree, tiny_skia::Transform::default(), &mut pm.as_mut());
+                    
+                    pm.save_png("./pngs/".to_string() + file_name + ".png").unwrap();
+
                     get_bbox(&tree.root(), &mut all_bboxes);
-                    for bbox in &all_bboxes {
-                        println!("{} {} {} {}\n", bbox.x(), bbox.y(), bbox.width(), bbox.height());
-                    }
 
                     let bounds = all_bboxes.clone().iter().map(|bbox| {
                         vec![bbox.left(), bbox.right(), bbox.top(), bbox.bottom()]
