@@ -11,10 +11,10 @@ from svgpathtools import svg2paths2
 dotenv.load_dotenv()
 
 def add_rect(file, bounds = None, save_to = None, color = "red", labels = None):
-    with open(f"./svgs/{file}") as f:
+    with open(f"./id_svg/{file}_withID.svg") as f:
         soup = BeautifulSoup(f, "xml")
         root = soup.find("svg")
-        _,_, attr = svg2paths2(f"./svgs/{file}")
+        _,_, attr = svg2paths2(f"./id_svg/{file}_withID.svg")
 
     dim = attr["viewBox"].split(" ")
 
@@ -26,24 +26,29 @@ def add_rect(file, bounds = None, save_to = None, color = "red", labels = None):
 
     if not bounds:
         data = json.load(open(f"./jsons/{file}.json"))
-        bounds = list(set(map(lambda x: (x[0], x[2], x[1] - x[0], x[3] - x[2]), data["bounds"])))
     else:
-        bounds = list(map(lambda x: (x[0]*svg_width, x[2]*svg_height, (x[1] - x[0])*svg_width, (x[3] - x[2])*svg_height), bounds))
+        bounds = list(map(lambda x: (x[0] * svg_width, x[1] * svg_width, x[2] * svg_height, x[3] * svg_height), bounds))
 
-    for index, (left, top, width, height) in enumerate(bounds):
-        group = soup.new_tag("g")
-        rect = soup.new_tag("rect", x=left, y=top, width=width, height=height, fill="none", stroke=color)
-        group.append(rect)
-
-        if labels:
+    if labels:
+        for index, (left, right, top, bottom) in enumerate(bounds):
+            group = soup.new_tag("g")
+            rect = soup.new_tag("rect", x=left, y=top, width=right-left, height=bottom-top, fill="none", stroke=color)
+            group.append(rect)
             text = soup.new_tag("text", x=left+5, y=top+10, fill=color)
             text.attrs["font-size"] = "7px"
             text.insert(0, labels[index])
             group.append(text)
-
-
-        root.append(group)
-
+            root.append(group)
+    else:
+        for key, (left, right, top, bottom) in data.items():
+            group = soup.new_tag("g")
+            rect = soup.new_tag("rect", x=left, y=top, width=right-left, height=bottom-top, fill="none", stroke=color)
+            group.append(rect)
+            text = soup.new_tag("text", x=left+5, y=top+10, fill=color)
+            text.attrs["font-size"] = "7px"
+            text.insert(0, key)
+            group.append(text)
+            root.append(group)
     with open(f"./visualized/{file}-bounded.svg" if not save_to else save_to, "w", encoding="utf-8") as f:
         f.write(str(soup))
 
