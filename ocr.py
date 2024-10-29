@@ -49,6 +49,8 @@ def add_rect(file, bounds = None, save_to = None, color = "red", labels = None):
             text.insert(0, key)
             group.append(text)
             root.append(group)
+
+        return data;
     with open(f"./visualized/{file}-bounded.svg" if not save_to else save_to, "w", encoding="utf-8") as f:
         f.write(str(soup))
 
@@ -78,7 +80,7 @@ def interogate(image_path):
         'Content-Type': 'application/json'
     }
 
-    url = f"https://vision.googleapis.com/v1/images:annotate?key={os.getenv("OCR")}"
+    url = f"https://vision.googleapis.com/v1/images:annotate?key={os.getenv('OCR')}"
 
     response = requests.request("POST", url, headers=headers, data=payload)
 
@@ -93,7 +95,7 @@ def interogate(image_path):
     bounds = []
     labels = []
     draw = ImageDraw.Draw(image)
-    for text in output['responses'][0]["textAnnotations"]:
+    for text in output['responses'][0]["textAnnotations"][1:]:
         cur = []
         draw.polygon(tuple(map(lambda x: (x.get("x", 0), x.get("y", 0)), text["boundingPoly"]["vertices"])), outline="red")
         for point in text["boundingPoly"]["vertices"]:
@@ -114,5 +116,5 @@ def interogate(image_path):
 
     svg = image_path.split("/")[-1].replace(".png", "")
     add_rect(image_path.split("/")[-1].replace(".png", ""), bounds, save_to=f"./output/ocred-{svg}.svg", labels=labels, color="blue")
-
-interogate("./pngs/text cool.svg.png")
+    
+    return { labels[i]:bounds[i] for i in range(len(labels)) }
