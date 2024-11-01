@@ -46,16 +46,16 @@ def optimize1(d, x, depth=100, overallMin=float("inf")):
 
 
 # Case 1: Center of path in bound => x_ij = 1 (x in [ bound_left, bound_right ] AND y in [ bound_top, bound_bottom ])
-# Case 2: Center of path not in any bound => x_ij = 1 such that D_ij min (D_ij is the min distance to a point in the OCR box)
+# Case 2: Center of path not in any bound => x_ij = 1 when D_ij min (D_ij is the min distance to a point in the OCR box)
 #   - Subcase 1: Center is closer to vertex (center_x NOT in [bound_left, bound_right] AND center_y NOT in [bound_top, bound_bottom]) => D_ij = distance to closest vertex
 #   - Subcase 2: Center is closer to edge (x in [ bound_left, bound_right ] OR y in [ bound_top, bound_bottom ])  => D_ij = distance to closest edge
 
 def optimize2(ocr_bounds, path_center, assign): 
     m,n = len(path_center), len(ocr_bounds)
     for i in range(m):
-        min_distance_index = 0
-        min_distance = float("inf")
-        flag = False
+        # min_distance_index = 0
+        # min_distance = float("inf")
+        # flag = False
         for j in range(n):
             x,y = path_center[i]
             left,right,top,bottom = ocr_bounds[j]
@@ -64,19 +64,19 @@ def optimize2(ocr_bounds, path_center, assign):
                 assign[i][j] = 1
                 flag=True
                 break
-            elif left <= x <= right:
-                curMin = min( abs(y-top), abs(y-bottom) )
-            elif top <= y <= bottom:
-                curMin = min( abs(x- left), abs(x-right) )
-            else:
-                minx = min(right, max(left, x))
-                miny = min(bottom, max(top, y))
-                curMin = math.sqrt((x-minx)**2 + (y-miny)**2)
-            if curMin < min_distance:
-                min_distance = curMin
-                min_distance_index = j
-        if not flag:
-            assign[i][min_distance_index] = 1          
+            # elif left <= x <= right:
+            #     curMin = min( abs(y-top), abs(y-bottom) )
+            # elif top <= y <= bottom:
+            #     curMin = min( abs(x- left), abs(x-right) )
+            # else:
+            #     minx = min(right, max(left, x))
+            #     miny = min(bottom, max(top, y))
+            #     curMin = math.sqrt((x-minx)**2 + (y-miny)**2)
+        #     if curMin < min_distance:
+        #         min_distance = curMin
+        #         min_distance_index = j
+        # if not flag:
+        #     assign[i][min_distance_index] = 1          
 
 for _,_,files in walk("./svgs"):
     for file in files:
@@ -125,8 +125,29 @@ for _,_,files in walk("./svgs"):
         # Match path assignments with OCR descriptions
         group = [[] for i in range(n)]
         for i in range(m):
-            group[x[i].index(1)].append(json_map[i])
+            if max(x[i]):
+                group[x[i].index(1)].append(json_map[i])
         for i in range(n):
             print(f"{ocr_map[i]}: {group[i]}")
+
+
+        for text_index, e_list in enumerate(group):
+            for element_id in e_list:
+                e = soup.find(id=element_id)
+                if e: e.decompose()
+            
+            text_content = ocr_map[text_index]
+
+            x,y = center_ocr[text_index]
+            replacement = soup.new_tag("text",x=x,y=y, color="green")
+            replacement.insert(0, text_content)
+
+            root.append(replacement)
+            
+
+
+        with open(f"./finalized_svg/{file}_final.svg", "wb") as wf:
+            wf.write(soup.prettify("utf-8"))
+        
 
                 
