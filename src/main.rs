@@ -16,10 +16,23 @@ fn get_bbox(root : &usvg::Node, counter: &mut u32, smap: &mut HashMap<String, Ve
     // let mut level_bound = Vec::<usvg::PathBbox>::new();
     for child in root.descendants() {
         *counter += 1;
-        let cur_id = &format!("object_{}", counter);
-        if let NodeKind::Group(ref mut g) = *child.borrow_mut() {
-            g.id = cur_id.to_string();
+
+
+        match *child.borrow_mut() {
+            NodeKind::Group(ref mut g) => {
+                g.id = format!("object_{}", counter);
+            },
+            NodeKind::Path(ref mut p) => {
+                p.id = format!("object_{}", counter);
+            },
+            NodeKind::Text(ref mut t) => {
+                t.id = format!("text_element_{}", counter);
+            },
+            NodeKind::Image(ref mut i) => {
+                i.id = format!("image_{}", counter);
+            },
         }
+
         if let Some(b)= child.calculate_bbox() {
             // level_bound.push(b);
             // id_list.push(cur_id.to_string());
@@ -29,7 +42,7 @@ fn get_bbox(root : &usvg::Node, counter: &mut u32, smap: &mut HashMap<String, Ve
                 continue;
             }
             vset.insert(hash);
-            smap.insert(cur_id.to_string(), v);
+            smap.insert(format!("object_{}", counter), v);
         }
     }
     // total.extend(level_bound);

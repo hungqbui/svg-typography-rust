@@ -49,10 +49,10 @@ def add_rect(file, bounds = None, save_to = None, color = "red", labels = None):
             text.insert(0, key)
             group.append(text)
             root.append(group)
+        with open(f"./visualized/{file}-bounded.svg" if not save_to else save_to, "w", encoding="utf-8") as f:
+            f.write(str(soup))
 
-        return data;
-    with open(f"./visualized/{file}-bounded.svg" if not save_to else save_to, "w", encoding="utf-8") as f:
-        f.write(str(soup))
+        return data
 
 def interogate(image_path):
     image = Image.open(image_path)

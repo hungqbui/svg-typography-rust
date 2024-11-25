@@ -78,76 +78,7 @@ def optimize2(ocr_bounds, path_center, assign):
         # if not flag:
         #     assign[i][min_distance_index] = 1          
 
-for _,_,files in walk("./svgs"):
-    for file in files:
-        json_dict = add_rect(file)
-        ocr_dict = interogate(f"./pngs/{file}.png")
 
-        if (not ocr_dict): continue
-
-        with open(f"./id_svg/{file}_withID.svg") as f:
-            soup = BeautifulSoup(f, "xml")
-            root = soup.find("svg")
-            _,_, attr = svg2paths2(f"./id_svg/{file}_withID.svg")
-
-        dim = attr["viewBox"].split(" ")
-
-        svg_width = float(dim[2].replace("px",""))
-        svg_height = float(dim[3].replace("px",""))
-
-        m,n = len(json_dict), len(ocr_dict)
-
-        json_map = {i : key for key, i in zip(list(json_dict.keys()), range(m))}
-        ocr_map = {i : key for key, i in zip(list(ocr_dict.keys()), range(n))}
-
-        bounds_json = list(json_dict.values())
-        bounds_ocr = list(ocr_dict.values())
-        bounds_ocr = [(left * svg_width, right * svg_width, top * svg_height, bottom * svg_height) for left,right,top,bottom in bounds_ocr]
-
-        center_json = [((b[1] + b[0]) / 2, (b[2] + b[3]) / 2) for b in bounds_json]
-        center_ocr = [((b[1] + b[0]) / 2, (b[2] +  b[3]) / 2) for b in bounds_ocr]
-
-        d = [[ 0 for i in range(n) ] for j in range(m)]
-
-
-        for i in range(m):
-            x1,y1 = center_json[i][0], center_json[i][1]
-            for j in range(n):
-                x2,y2 = center_ocr[j][0], center_ocr[j][1]
-
-                d[i][j] = math.sqrt((x2-x1) ** 2 + (y2-y1)**2)
-
-        x = [ [0] * (n) for i in range(m) ]
-        
-        optimize2(bounds_ocr, center_json, x)
-
-
-        # Match path assignments with OCR descriptions
-        group = [[] for i in range(n)]
-        for i in range(m):
-            if max(x[i]):
-                group[x[i].index(1)].append(json_map[i])
-        for i in range(n):
-            print(f"{ocr_map[i]}: {group[i]}")
-
-
-        for text_index, e_list in enumerate(group):
-            for element_id in e_list:
-                e = soup.find(id=element_id)
-                if e: e.decompose()
-            
-            text_content = ocr_map[text_index]
-
-            x,y = center_ocr[text_index]
-            replacement = soup.new_tag("text",x=x,y=y, color="green")
-            replacement.insert(0, text_content)
-
-            root.append(replacement)
-            
-
-
-        with open(f"./finalized_svg/{file}_final.svg", "wb") as wf:
-            wf.write(soup.prettify("utf-8"))
         
 
                 

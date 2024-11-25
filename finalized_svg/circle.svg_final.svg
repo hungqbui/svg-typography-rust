@@ -5,12 +5,12 @@
    <path d="M 165.839844 158 L 644.339844 158 L 644.339844 652 L 165.839844 652 Z M 165.839844 158" fill="#000000" stroke="none"/>
   </clipPath>
  </defs>
- <path d="M -81 -80.999999 L 891 -80.999999 L 891 890.999993 L -81 890.999993 Z" fill="#ffffff" stroke="none"/>
- <path d="M -81 -80.999999 L 891 -80.999999 L 891 890.999993 L -81 890.999993 Z" fill="#ffffff" stroke="none"/>
+ <path d="M -81 -80.999999 L 891 -80.999999 L 891 890.999993 L -81 890.999993 Z" fill="#ffffff" id="object_2" stroke="none"/>
+ <path d="M -81 -80.999999 L 891 -80.999999 L 891 890.999993 L -81 890.999993 Z" fill="#ffffff" id="object_3" stroke="none"/>
  <text color="green" x="423.0" y="289.87499749490746">
   the
  </text>
- <text color="green" x="403.5" y="399.7499965453703">
+ <text color="green" x="403.875" y="399.7499965453703">
   CIRCLE
  </text>
  <text color="green" x="320.25" y="480.3749958486111">
