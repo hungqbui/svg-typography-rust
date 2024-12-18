@@ -55,6 +55,13 @@ def add_rect(file, bounds = None, save_to = None, color = "red", labels = None):
         return data
 
 def interogate(image_path):
+    try:
+        cached = open(f"./ocrcache/{image_path.split('/')[-1]}.json", "r")
+    except FileNotFoundError:
+        cached = None
+    if cached:
+        return json.load(cached)
+
     image = Image.open(image_path)
     buffer = BytesIO()
     image.save(buffer, format="PNG")
@@ -117,4 +124,8 @@ def interogate(image_path):
     svg = image_path.split("/")[-1].replace(".png", "")
     add_rect(image_path.split("/")[-1].replace(".png", ""), bounds, save_to=f"./output/ocred-{svg}.svg", labels=labels, color="blue")
     
-    return { labels[i]:bounds[i] for i in range(len(labels)) }
+    out = { labels[i]:bounds[i] for i in range(len(labels)) }
+    with open(f"./ocrcache/{image_path.split('/')[-1]}.json", "w") as f:
+        json.dump(out, f)
+
+    return out
